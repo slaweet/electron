@@ -899,7 +899,7 @@ describe('asar package', function () {
       })
     })
 
-    it('loads video tag in html', function (done) {
+    xit('loads video tag in html', function (done) {
       this.timeout(60000)
 
       after(function () {
