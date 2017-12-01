@@ -2,7 +2,7 @@ const assert = require('assert')
 const {autoUpdater} = require('electron').remote
 const {ipcRenderer} = require('electron')
 
-describe('autoUpdater module', function () {
+describe('autoUpdater module', () => {
   // XXX(alexeykuzmin): Calling `.skip()` in a 'before' hook
   // doesn't affect nested 'describe's
   beforeEach(function () {
@@ -12,33 +12,33 @@ describe('autoUpdater module', function () {
     }
   })
 
-  describe('checkForUpdates', function () {
-    it('emits an error on Windows when called the feed URL is not set', function (done) {
+  describe('checkForUpdates', () => {
+    it('emits an error on Windows when called the feed URL is not set', (done) => {
       if (process.platform !== 'win32') {
         // FIXME(alexeykuzmin): Skip the test.
         // this.skip()
         return done()
       }
 
-      ipcRenderer.once('auto-updater-error', function (event, message) {
+      ipcRenderer.once('auto-updater-error', (event, message) => {
         assert.equal(message, 'Update URL is not set')
         done()
       })
       autoUpdater.setFeedURL('')
       autoUpdater.checkForUpdates()
+
+      autoUpdater.once('checking-for-update', () => done())
     })
   })
 
-  describe('setFeedURL', function () {
-    describe('on Mac', function () {
-      before(function () {
-        if (process.platform !== 'darwin') {
-          this.skip()
-        }
+  describe('setFeedURL', () => {
+    describe('on Mac', () => {
+      before(() => {
+        if (process.platform !== 'darwin') this.skip()
       })
 
-      it('emits an error when the application is unsigned', function (done) {
-        ipcRenderer.once('auto-updater-error', function (event, message) {
+      it('emits an error when the application is unsigned', (done) => {
+        ipcRenderer.once('auto-updater-error', (event, message) => {
           assert.equal(message, 'Could not get code signature for running application')
           done()
         })
@@ -47,12 +47,12 @@ describe('autoUpdater module', function () {
     })
   })
 
-  describe('getFeedURL', function () {
-    it('returns a falsey value by default', function () {
+  describe('getFeedURL', () => {
+    it('returns a falsey value by default', () => {
       assert.ok(!autoUpdater.getFeedURL())
     })
 
-    it('correctly fetches the previously set FeedURL', function (done) {
+    it('correctly fetches the previously set FeedURL', (done) => {
       if (process.platform !== 'win32') {
         // FIXME(alexeykuzmin): Skip the test.
         // this.skip()
@@ -66,15 +66,15 @@ describe('autoUpdater module', function () {
     })
   })
 
-  describe('quitAndInstall', function () {
-    it('emits an error on Windows when no update is available', function (done) {
+  describe('quitAndInstall', () => {
+    it('emits an error on Windows when no update is available', (done) => {
       if (process.platform !== 'win32') {
         // FIXME(alexeykuzmin): Skip the test.
         // this.skip()
         return done()
       }
 
-      ipcRenderer.once('auto-updater-error', function (event, message) {
+      ipcRenderer.once('auto-updater-error', (event, message) => {
         assert.equal(message, 'No update available, can\'t quit and install')
         done()
       })
@@ -83,14 +83,14 @@ describe('autoUpdater module', function () {
   })
 
   describe('error event', function () {
-    it('serializes correctly over the remote module', function (done) {
+    it('serializes correctly over the remote module', (done) => {
       if (process.platform === 'linux') {
         // FIXME(alexeykuzmin): Skip the test.
         // this.skip()
         return done()
       }
 
-      autoUpdater.once('error', function (error) {
+      autoUpdater.once('error', (error) => {
         assert.equal(error instanceof Error, true)
         assert.deepEqual(Object.getOwnPropertyNames(error), ['stack', 'message', 'name'])
         done()
@@ -98,9 +98,7 @@ describe('autoUpdater module', function () {
 
       autoUpdater.setFeedURL('')
 
-      if (process.platform === 'win32') {
-        autoUpdater.checkForUpdates()
-      }
+      if (process.platform === 'win32') autoUpdater.checkForUpdates()
     })
   })
 })
